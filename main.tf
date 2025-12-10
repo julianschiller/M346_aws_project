@@ -52,3 +52,52 @@ resource "aws_lambda_permission" "allow_apigw" {
 output "api_url" {
   value = aws_apigatewayv2_api.http_api.api_endpoint
 }
+
+resource "aws_dynamodb_table" "notes" {
+  name         = "Notes"
+  billing_mode = "PAY_PER_REQUEST"
+
+  # Primary Key
+  hash_key     = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+  attribute {
+    name = "created_time"
+    type = "S"
+  }
+
+  attribute {
+    name = "text"
+    type = "S"
+  }
+
+  attribute {
+    name = "title"
+    type = "S"
+  }
+
+  tags = {
+    Project = "M346"
+  }
+}
+
+
+resource "aws_lambda_function" "api_handler" {
+  function_name = "m346-api-handler"
+  role          = "arn:aws:iam::<ACCOUNT-ID>:role/LabRole"
+  runtime       = "python3.9"
+  handler       = "lambda_function.lambda_handler"
+
+  filename         = "lambda_function.zip"
+  source_code_hash = filebase64sha256("lambda_function.zip")
+
+  environment {
+    variables = {
+      TABLE_NAME = aws_dynamodb_table.images.name
+    }
+  }
+}
