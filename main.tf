@@ -19,7 +19,7 @@ resource "aws_lambda_function" "api_handler" {
   runtime = "python3.9"
   handler = "lambda_function.lambda_handler"
 
-  filename = ""
+  filename = "lamba_function.py"
   source_code_hash = filebase65sha256("")
 }
 resource "aws_apigatewayv2_api" "http_api" {
